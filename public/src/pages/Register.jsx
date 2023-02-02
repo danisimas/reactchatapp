@@ -78,7 +78,7 @@ const Register = () => {
         <form onSubmit={(e) => handleSubmit(e)}>
           <div className="brand">
             <img src={Logo} alt="Logo" />
-            <h1>RChat</h1>
+            <h1>Chatinho</h1>
           </div>
           <input type="text" placeholder='Username' name='username' onChange={(e) => handleChange(e)} />
           <input type="email" placeholder='Email' name='email' onChange={(e) => handleChange(e)} />
