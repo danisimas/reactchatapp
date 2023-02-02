@@ -1,11 +1,16 @@
 const messageModel = require("../models/messageModel");
 
+const crypto = require("crypto-js");
+
+const key = "chave_secreta";
+
+
 module.exports.addMessage = async (req, res, next) => {
     try {
         const {from,to,message} = req.body;
         const data = await messageModel.create({
             message:{
-                text: message
+                text: crypto.RC4.encrypt(message, key).toString()
             },
             users: [
                 from,
@@ -37,7 +42,7 @@ module.exports.getAllMessage = async (req, res, next) => {
         const projectMessages = messages.map((msg)=>{
             return{
                 fromSelf: msg.sender.toString() === from,
-                message: msg.message.text,
+                message: crypto.RC4.decrypt(encryptedMessage, key).toString(crypto.enc.Utf8)
             };
         });
 
