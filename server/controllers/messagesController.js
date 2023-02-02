@@ -42,7 +42,7 @@ module.exports.getAllMessage = async (req, res, next) => {
         const projectMessages = messages.map((msg)=>{
             return{
                 fromSelf: msg.sender.toString() === from,
-                message: crypto.RC4.decrypt(encryptedMessage, key).toString(crypto.enc.Utf8)
+                message: crypto.RC4.decrypt(msg.message.text, key).toString(crypto.enc.Utf8)
             };
         });
 
