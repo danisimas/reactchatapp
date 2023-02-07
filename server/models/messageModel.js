@@ -11,6 +11,7 @@ const messageSchema = mongoose.Schema(
       ref: "User",
       required: true,
     },
+    PublicKey: { type: Number, required: true}
   },
   {
     timestamps: true,
