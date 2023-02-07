@@ -40,16 +40,16 @@ function diffieHellman(p, g) {
   
     const sharedSecretA = (publicKeyB ** privateKeyA) % p;
     const sharedSecretB = (publicKeyA ** privateKeyB) % p;
-  
-    return [sharedSecretA, sharedSecretB];
+    if (sharedSecretA === sharedSecretB) return [sharedSecretA, sharedSecretB];
 }
 
-var number = 5;
-var prime = 23;
+const number = 5;
+const prime = 23;
+const [sharedSecretA,sharedSecretB] = diffieHellman(prime,number)
 module.exports.addMessage = async (req, res, next) => { 
     try {
         
-        var [sharedSecretA,sharedSecretB] = diffieHellman(prime,number) 
+        
         const {from,to,message} = req.body;     
         console.log([sharedSecretA,sharedSecretB])
         const data = await messageModel.create({
