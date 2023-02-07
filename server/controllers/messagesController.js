@@ -1,4 +1,5 @@
 const messageModel = require("../models/messageModel");
+
 function encryptRC4(text, key) {
         let s = [];
         for (let i = 0; i < 256; i++) {
@@ -43,41 +44,14 @@ function diffieHellman(p, g) {
     return [sharedSecretA, sharedSecretB];
 }
 
-  function getNextPrime(start, end) {
-    for (let i = start + 1; i <= end; i++) {
-      if (isPrime(i)) {
-        return i;
-      }
-    }
-    
-    return -1;
-  }
-  
-  function isPrime(num) {
-    if (num < 2) return false;
-    
-    for (let i = 2; i <= Math.sqrt(num); i++) {
-      if (num % i === 0) {
-        return false;
-      }
-    }
-    
-    return true;
-  }
-function getInteger() {
-    return Math.floor(Math.random() * 100);
-}
-
-
-const number = getInteger();
-const prime = getNextPrime(1,100)
-
-const [sharedSecretA,sharedSecretB] = diffieHellman(prime,number) 
-  
-
+var number = 5;
+var prime = 23;
 module.exports.addMessage = async (req, res, next) => { 
     try {
-        const {from,to,message} = req.body;
+        
+        var [sharedSecretA,sharedSecretB] = diffieHellman(prime,number) 
+        const {from,to,message} = req.body;     
+        console.log([sharedSecretA,sharedSecretB])
         const data = await messageModel.create({
             message:{
                 text: encryptRC4(message,sharedSecretA.toString())
@@ -86,7 +60,7 @@ module.exports.addMessage = async (req, res, next) => {
                 from,
                 to
             ],
-            PublicKey: sharedSecretB,
+            PublicKey: sharedSecretB.toString(),
             sender:from,
         });
         console.log(sharedSecretA)
@@ -106,6 +80,12 @@ module.exports.addMessage = async (req, res, next) => {
 module.exports.getAllMessage = async (req, res, next) => {
     try {
     const {from,to} = req.body;
+
+    const publicKey = await messageModel.findOne({
+        users: {
+            $all: [from, to],
+        },
+        }).select('PublicKey');
     const messages = await messageModel.find({
         users: {
             $all: [from, to],
@@ -116,7 +96,7 @@ module.exports.getAllMessage = async (req, res, next) => {
 
         return {
             fromSelf: msg.sender.toString() === from,
-            message: decryptRC4(msg.message.text,sharedSecretB)
+            message: decryptRC4(msg.message.text,publicKey.PublicKey.toString())
         };
     });
     res.json(projectMessages);
